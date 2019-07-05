@@ -1,3 +1,4 @@
+const imageService = require('./image.service');
 
 // models
 const Post = require('../models/Post');
@@ -9,11 +10,22 @@ module.exports = {
 /**
  * Upload single image.
  * @param {string} title a string that represents a post's title.
- * @param {string} image a string that represents a post's image url.
+ * @param {object} file a object that represents a post's image
  * @returns A Promise or exception.
  */
-async function createPost(title, image) {
-  const post = new Post({ title, image });
+async function createPost(title, file) {
+  const post = new Post({ title });
 
-  return post.save();
+  if(file) {
+    // upload image to cloudinary
+    const imageUrl = await imageService.uploadSingle(file);
+
+    // create image and save to database
+    await imageService.createImage(imageUrl);
+
+     // set image url
+     post.image = imageUrl.url;
+  }
+
+  return post.save(); 
 }

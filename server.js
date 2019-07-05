@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cloudinary = require('./config/cloudinary-config');
 const errorHandler = require('./helpers/error-handler');
+const cloudinary = require('cloudinary');
 
 // Initialize
 const app = express();
@@ -18,11 +18,16 @@ mongoose
 // Body-parser middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cloudinary.cloudinaryConfig);
-
 
 // Router middleware
 app.use('/api/posts', require('./controllers/post.controller'));
+
+// cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // error handler
 app.use(errorHandler);
